@@ -1,0 +1,28 @@
+{
+  "name": "dbuilder",
+  "description": "dbuilder.",
+  "version": "0.0.1",
+  "author": "ddxq-team <asoiso@foxmail.com>",
+  "homepage": "http://www.ddxq.mobi/",
+  "keywords": [
+    "dbuilder"
+  ],
+  "bin": {
+    "fis": "bin/dbuilder"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ddxq-team/dbuilder.git"
+  },
+  "dependencies": {
+    "art-template": "3.0.3",
+    "commander": "1.3.2"
+  }
+}
