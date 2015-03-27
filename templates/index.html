@@ -1,1 +1,513 @@
-{{data.name}}
+
+<div id="main">
+
+  <div id="toolbar">
+    <div id="tabsType">
+      <div title="上架中" data-status="Sale" style="display:none;"></div>
+      <div title="下架中" data-status="Unsale" style="display:none;"></div>
+      <div title="缺货中" data-status="Stockout" style="display:none;"></div>
+    </div>
+    <div class="tb_line" style="margin-top:5px;">
+      <input id="filterSearch" />
+      <span class="tb_label">服务站: </span>
+      <input id="filterStation" />
+
+      <span class="tb_label">商家: </span>
+      <input id="filterPartner" />
+
+      <span class="tb_label">分类: </span>
+      <span id="filterCategory"></span>
+    </div>
+
+    <div class="tb_box">
+      <a href="#" class="easyui-menubutton" data-options="menu:'#bulkActions',iconCls:'icon-edit'">批量操作</a>
+      <div id="bulkActions">
+        <div class="J-bulkSale" data-options="iconCls:'icon-redo'">批量上架</div>
+        <div class="J-bulkUnSale" data-options="iconCls:'icon-undo'">批量下架</div>
+        <div class="J-bulkRemove" data-options="iconCls:'icon-no'">批量删除</div>
+      </div>
+    </a>
+    <a href="javascript:;" class='J-add easyui-linkbutton' iconCls="icon-add" plain="true">添加</a>
+  </div>
+</div>
+
+<table id="list"></table>
+
+</div>
+
+
+<div style="display: none;">
+  <div id="dialogInput">
+    <form id="formInput" method="post" action="">
+      <input type="hidden" name="_id" id="_id" />
+      <ul>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>编号: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="number" name="number" style="width: 300px;" class="easyui-validatebox" required="true" placeholder="请输入商品编号，不能重复" />
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>名称: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="name" name="name" style="width: 300px;" class="easyui-validatebox" required="true" placeholder="请输入商品名称，不能重复" />
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>描述: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="description" name="description" style="width: 300px;" class="easyui-validatebox" placeholder="请输入商品描述" />
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>单价: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="price" name="price" style="width: 300px;" class="easyui-validatebox" required="true" placeholder="请输入商品单价(例:5.59)"/>
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>最大可购买数量: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="max_number_purchase" name="max_number_purchase" style="width: 300px;" class="easyui-validatebox" required="true" value="20" placeholder="请输入商品单次最大可购买数量"/>
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>商品制作时间: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="production_time" name="production_time" style="width: 300px;" class="easyui-validatebox" required="true" value="" placeholder="商品制作时间（单位：秒）"/>
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>分类: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="category" name="category" />
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>状态: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="status" name="status" />
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>商家: </span>
+            </div>
+            <div class="box_flex f_content">
+              <input type="text" id="partner" name="partner" />
+            </div>
+          </div>
+        </li>
+        <li class="f_item">
+          <div class="box">
+            <div class="f_label">
+              <span>图片: </span>
+            </div>
+            <div id="upload_image_list" class="box_flex f_content"></div>
+          </div>
+        </li>
+      </ul>
+    </form>
+
+    <form id="uploadQiniu" target="exec_target" method="post" action="http://up.qiniu.com/" enctype="multipart/form-data" style="padding-left:85px">
+      <input class="token" name="token" type="hidden" value="">
+      <input class="key" name="key" type="hidden" value="">
+      <input class="file" type="file" name="file" accept="image/jpeg,image/gif,image/png" />
+      <!-- <button class="upload" type="button">上传照片</button> -->
+    </form>
+    <ul>
+      <li class="f_item">
+        <div class="box">
+          <div class="f_label">
+            <span></span>
+          </div>
+          <font color="#ff0000">请上传160*160，大小不超过500k的图片</font>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/widget/category.js"></script>
+
+<script>
+  ;(function(app){
+
+    var imageAlias = '<?php echo $imageAlias; ?>';
+    var wWidth = $(window).width();
+    var wHeight = $(window).height();
+
+    app.page = {
+      options:{
+        name:''
+      },
+      init: function(opts) {
+        $.extend(this.options, opts);
+        this._initData();
+        this._initPage();
+        this._initAttr();
+        this._initComponents();
+        this._initList();
+        this._initInput();
+        this._initShow();
+        this._initEvents();
+      },
+      // 初始化数据
+      _initData:function(){
+        this.listType = 'Sale';
+      },
+      // 初始化页面
+      _initPage: function() {
+
+      },
+      // 初始化属性
+      _initAttr: function() {
+        var that = this;
+        this.$container = $("#main");
+        this.$bulkActions = $("#bulkActions");
+      },
+      // 初始化页面组件
+      _initComponents: function() {
+        var that = this;
+        this.$tabsType = $("#tabsType");
+        this.$tabsType.tabs({
+          border:false,
+          plain:true,
+          onSelect:function(title){
+            that.listType = that.$tabsType.tabs('getSelected').data('status');
+            if(that.isInit){
+              that.search();
+            }
+          }
+        });
+
+        this.$filterSearch = $("#filterSearch");
+        this.$filterSearch.searchbox({
+          width: 150,
+          prompt: '请输入关键字',
+          searcher:function(value){
+            that.search();
+          }
+        });
+
+        this.$filterStation = $("#filterStation");
+        this.$filterStation.combobox({
+          width: 100,
+          editable: false,
+          valueField: '_id',
+          textField: 'name',
+          url:'/serviceStation/station/comboboxList',
+          onSelect: function(value){
+            that.search();
+            that.$filterPartner.combobox('clear');
+            that.$filterPartner.combobox('reload','/delivery/partner/comboboxList?service_station='+value._id)
+          }
+        });
+
+        this.$filterPartner = $("#filterPartner");
+        this.$filterPartner.combobox({
+          width: 200,
+          editable: false,
+          valueField: '_id',
+          textField: 'name',
+          onSelect: function(){
+            that.search();
+          }
+        });
+
+        this.$filterCategory = $("#filterCategory");
+        this.$filterCategory.category({
+          url:'/delivery/productCategory/selector?parent={_id}',
+          onSelect: function(){
+            that.search();
+          }
+        });
+
+      },
+      //初始化列表组件
+      _initList:function(){
+        var that = this;
+        this.$list = $("#list");
+        this.$list.datagrid({
+          url: this.getUrl('getSaleRows'),
+          height: wHeight - 20,
+          title: this.getTitle('列表'),
+          fitColumns: true,
+          autoRowHeight: true,
+          striped: true,
+          toolbar: '#toolbar',
+          singleSelect: true,
+          selectOnCheck: false,
+          checkOnSelect: false,
+          pagination: true,
+          pageList: [20, 30, 50],
+          pageSize: 20,
+          nowrap: false,
+          idField: '_id',
+          sortName: 'create_time',
+          sortOrder: 'asc',
+          queryParams: this.getParams(),
+          frozenColumns:[[{
+            field:'ck',
+            checkbox:true
+          }]],
+          columns:[[{
+            field:'_id',
+            title:'_id',
+            hidden:true
+          }, {
+            field:'image',
+            title:'缩略图',
+            width:15,
+            align:'center',
+            formatter: function(value, row){
+              if (!$.isEmptyObject(row.image_list)){
+                var src = row.image_list[0] + (row.image_list[0].indexOf(imageAlias) < 0 ? imageAlias : '');
+                return '<img width="80" height="80" src="' + src + '" />';
+              } else {
+                return '';
+              }
+            }
+          }, {
+            field:'base_name',
+            title:'商品名',
+            width:30
+          }, {
+            field:'base_price',
+            title:'基本价',
+            width:10,
+            align:'center',
+            formatter: function(value, row){
+              return '￥' + value;
+            }
+          }, {
+            field:'category_path_text',
+            title:'分类',
+            width:20,
+            formatter: function(value, row){
+              return value.join('<br />');
+            }
+          }, {
+            field:'property_value_text',
+            title:'属性',
+            width:20,
+            formatter: function(value, row){
+              return value.join('<br />');
+            }
+          }, {
+            field:'service_station_text',
+            title:'服务站',
+            width:20
+          }, {
+            field:'partner_name',
+            title:'商家',
+            width:20
+          }, {
+            field:'actions',
+            title:'操作',
+            width: 20,
+            align: 'center',
+            formatter: function(value, row){
+              var html = '<a class="J-edit" href="javascript:;" data-id="'+ row._id +'">编辑</a> | <a href="javascript:;" class="J-edit">服务站管理</a>';
+              // 已下架的商品才可以删除
+              if ("Unsale"==that.listType){
+                html += '|';
+                html += '<a class="J-remove" href="javascript:;" data-id="'+ row._id +'">删除</a>';
+              }
+              return html;
+            }
+          }]],
+          onClickRow: function(index, row){
+
+          },
+          onLoadSuccess:function(){
+            that.isInit=true;
+          }
+        });
+      },
+      //初始化编辑&添加的输入
+      _initInput:function(){
+        var that = this;
+        this.$dialogInput = $("#dialogInput");
+        this.$formInput = $("#formInput");
+
+        this.$dialogInput.dialog({
+          title: that.getTitle('详情'),
+          width: 800,
+          height: 500,
+          modal: true,
+          closed: true,
+          buttons:[{
+            text: '确认',
+            iconCls: 'icon-ok',
+            handler: function(){
+              that.$formInput.submit();
+            }
+          },{
+            text: '取消',
+            iconCls: 'icon-cancel',
+            handler: function(){
+              that.$dialogInput.dialog('close');
+            }
+          }]
+        });
+
+        this.$formInput.form({
+          onSubmit: function(param){
+            this.url = that.$formInput.attr('action');
+            var isValid = $(this).form('validate');
+            if (isValid){
+              $.messager.progress();
+            }
+            return isValid;
+          },
+          success: function(res){
+            $.messager.progress('close');
+            var res = JSON.parse(res);
+
+            if (res.success){
+              that.$dialogInput.dialog('close');
+              that.$list.datagrid('reload');
+            }
+            showAlert(res.message, res.success);
+          }
+        });
+      },
+      //初始化查看详情
+      _initShow:function(){
+
+      },
+      // 初始化事件
+      _initEvents: function() {
+        var that = this;
+        //增加
+        this.$container.delegate('.J-add','click',function(){
+          that.add();
+        });
+
+        //编辑
+        this.$container.delegate('.J-edit','click',function(){
+          that.edit($(this).data('id'));
+        });
+
+        //删除
+        this.$container.delegate('.J-remove','click',function(){;
+          this.remove($(this).data('id'));
+        });
+
+        //批量上架
+        this.$bulkActions.delegate('.J-bulkSale','click',function(){
+          that.bulkSale();
+        });
+
+        //批量下架
+        this.$bulkActions.delegate('.J-bulkUnSale','click',function(){
+          that.bulkUnSale();
+        });
+
+        //批量删除
+        this.$bulkActions.delegate('.J-bulkRemove','click',function(){
+          that.bulkRemove();
+        });
+
+      },
+      getTitle:function(name){
+        return this.options.name + name;
+      },
+      getUrl:function(url,params){
+        return this.options.baseUrl + url;
+      },
+      getParams:function(){
+        return {
+          category: this.$filterCategory.category('getValue').last,
+          partner: this.$filterPartner.combobox('getValue'),
+          search: this.$filterSearch.searchbox('getValue'),
+          page:1
+        };
+      },
+      add: function(){
+        this.$formInput.form("clear");
+        this.$dialogInput.dialog('open');
+      },
+      edit:function(){
+        this.$dialogInput.dialog('open');
+      },
+      save: function(){
+
+      },
+      list: function(params) {
+        this.$list.datagrid(params);
+      },
+      search: function() {
+        this.list({
+          url:this.getUrl('get' + this.listType + 'Rows'),
+          pageNum: 1,
+          queryParams: this.getParams()
+        });
+      },
+      // 显示
+      show: function(id){
+        alert(id);
+      },
+      remove:function(id){
+        alert(id);
+      },
+      //批量删除
+      bulkRemove:function(){
+        alert('bulkRemove');
+      },
+      //批量上架
+      bulkSale:function(){
+        alert('bulkSale');
+      },
+      //批量下架
+      bulkUnSale:function(){
+        alert('bulkUnSale');
+      }
+    };
+
+  }(window));
+
+  //初始化页面
+  $(function() {
+    window.page.init({
+      name:'商品',
+      key:'{{data.name}}',
+      baseUrl:'/delivery/productBase/'
+    });
+  });
+
+</script>

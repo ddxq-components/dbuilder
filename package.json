@@ -3,7 +3,7 @@
   "description": "dbuilder.",
   "version": "0.0.1",
   "author": "ddxq-team <asoiso@foxmail.com>",
-  "homepage": "http://www.ddxq.mobi/",
+  "homepage": "http://www.100.me/",
   "keywords": [
     "dbuilder"
   ],
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "art-template": "3.0.3",
-    "commander": "1.3.2"
+    "commander": "1.3.2",
+    "gulp": "^3.8.10"
   }
 }
